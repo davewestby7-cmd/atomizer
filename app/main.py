@@ -154,7 +154,7 @@ def releases(bucket: str = "free", q: str = "", tag: str = "", source: str = "")
     if source:
         stmt = stmt.where(Release.source == source)
     with Session(engine) as s:
-        return [_to_json(r) for r in s.exec(stmt.limit(600)).all()]
+        return [_to_json(r) for r in s.exec(stmt.limit(5000)).all()]
 
 
 @app.get("/api/status")
