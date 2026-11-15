@@ -94,3 +94,32 @@ sources:
     enabled: true
     queries: [psytrance, goa trance, darkpsy, forest psytrance, full on psytrance, hi-tech psytrance, israel psytrance]
     per_query: 50
+
+  bclabels:
+    # Bandcamp labels you follow. Every release shows on the Labels tab, at any price;
+    # free and cheap ones also show on the Free and Cheap tabs.
+    # Use the part before .bandcamp.com. Add {name: ..., max_albums: 0} for a whole catalogue.
+    enabled: true
+    max_albums: 60              # newest N releases per label (0 = all)
+    max_new_per_refresh: 300    # album pages read per refresh (1 per second); the rest come next time
+    labels:
+      - {name: zenonrecords, max_albums: 0}        # Zenon Records (Australia)
+      - {name: looneymoonrecords, max_albums: 0}   # Looney Moon Records
+      - {name: deepnoticrecords, max_albums: 0}    # Deepnotic Records
+      - hommega              # HOMmega Productions (Israel)
+      - bluetunesrecords     # Blue Tunes Records (Israel)
+      - sacredtechnology     # Sacred Technology (Israel)
+      - moonityrecords       # Moonity Records (Israel)
+      - timelapserecords     # TimeLapse Records (Israel)
+      - ibogarecords         # Iboga Records (Denmark)
+      - nanorecords          # Nano Records (UK)
+      - tiprecordsuk         # TIP Records (UK)
+      - ovnimoonrecords      # Ovnimoon Records
+      - ionomusic            # IONO Music
+      - dacrurecords         # Dacru Records
+      - profoundrecords      # Profound Records (India)
+      - occultarecords       # Occulta Records (India)
+      - sangomarecords       # Sangoma Records (South Africa)
+      - psygenrecords        # Psygen Records (Brazil)
+      - arrabida             # Arrabida Records (Brazil)
+      - enterrec             # Enterrec (UK)

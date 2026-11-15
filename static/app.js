@@ -1,7 +1,7 @@
 // Atomizer front end. Plain JavaScript, no build step: edit and reload the page.
 
 const $ = (sel) => document.querySelector(sel);
-const view = { bucket: "free", q: "", tag: "", source: "" };
+const view = { bucket: "free", q: "", tag: "", source: "", label: "" };
 let status = null;
 let playingId = null;
 const player = $("#player");
@@ -72,11 +72,20 @@ function renderChips() {
   box.innerHTML = "";
   const src = document.createElement("select");
   src.className = "bg-slate-900/80 border border-violet-800/60 rounded-full px-2 py-1 text-slate-300";
-  for (const [v, label] of [["", "all sources"], ["ektoplazm", "Ektoplazm"], ["bandcamp", "Bandcamp"], ["archive", "Internet Archive"], ["hearthis", "hearthis.at mixes"], ["sonictantra", "Sonic Tantra"], ["audius", "Audius"]]) {
+  for (const [v, label] of [["", "all sources"], ["ektoplazm", "Ektoplazm"], ["bandcamp", "Bandcamp"], ["archive", "Internet Archive"], ["hearthis", "hearthis.at mixes"], ["sonictantra", "Sonic Tantra"], ["audius", "Audius"], ["bclabels", "Bandcamp labels"]]) {
     src.add(new Option(label, v, false, view.source === v));
   }
   src.onchange = () => { view.source = src.value; loadReleases(); };
   box.appendChild(src);
+  if (view.bucket === "labels") {
+    // On the Labels tab: pick one label
+    const lab = document.createElement("select");
+    lab.className = src.className;
+    lab.add(new Option("all labels", "", false, view.label === ""));
+    for (const name of status.labels || []) lab.add(new Option(name, name, false, view.label === name));
+    lab.onchange = () => { view.label = lab.value; loadReleases(); };
+    box.appendChild(lab);
+  }
   for (const t of ["", ...status.tags]) {
     const b = document.createElement("button");
     b.textContent = t || "all styles";
@@ -90,7 +99,8 @@ function renderChips() {
 
 // ------------------------------------------------------------ grid
 async function loadReleases() {
-  const params = new URLSearchParams({ bucket: view.bucket, q: view.q, tag: view.tag, source: view.source });
+  const params = new URLSearchParams({ bucket: view.bucket, q: view.q, tag: view.tag, source: view.source,
+                                       label: view.bucket === "labels" ? view.label : "" });
   const rows = await (await fetch(`/api/releases?${params}`)).json();
   const grid = $("#grid");
   grid.innerHTML = "";
@@ -145,7 +155,7 @@ function card(r) {
     pull.onclick = () => doPull(r, node);
   } else {
     // Bandcamp: downloads happen on Bandcamp's own page.
-    pull.textContent = r.price_kind === "cheap" ? "🛒 Buy" : "⬇ Get";
+    pull.textContent = ["cheap", "paid"].includes(r.price_kind) ? "🛒 Buy" : "⬇ Get";
     pull.title = `Opens the ${r.source} page`;
     pull.onclick = () => window.open(r.page_url, "_blank", "noopener");
   }
@@ -168,12 +178,19 @@ function setFill(range) {
   range.style.setProperty("--pct", `${(range.value - range.min) * 100 / (range.max - range.min)}%`);
 }
 
-function togglePlay(r) {
+async function togglePlay(r) {
   if (nowRelease && nowRelease.id === r.id) {
     player.paused ? player.play() : player.pause();
-  } else {
-    loadTrack(r, 0);
+    return;
   }
+  if (r.source === "bclabels") {
+    // Bandcamp preview links expire after about a day: ask for fresh ones.
+    try {
+      const res = await (await fetch(`/api/tracks/${encodeURIComponent(r.id)}`)).json();
+      if (res.tracks?.length) r.tracks = res.tracks;
+    } catch {}
+  }
+  loadTrack(r, 0);
 }
 
 function loadTrack(r, index) {
@@ -390,6 +407,7 @@ $("#search").oninput = (e) => {
 
 function setTab(bucket) {
   view.bucket = bucket;
+  if (status) renderChips();
   document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("tab-active", t.dataset.bucket === bucket));
   try { localStorage.setItem("atomizer.tab", bucket); } catch {}
   loadReleases();

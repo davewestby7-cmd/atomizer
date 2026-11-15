@@ -11,6 +11,7 @@ can optionally sync that folder to Google Drive.
 - **Sonic Tantra** (sonictantra.com): an Indian dark, hi-tech and psycore label with dozens of free compilations from labels worldwide. Atomizer pulls the zips directly. There are no preview clips, so use 🔗 to listen first.
 - **Audius** (audius.co): an open platform where artists upload full-length psytrance tracks and sets. These play in full, not as 30-second samples. Tracks the artist has made freely downloadable can be pulled; the rest open Audius.
 - **Bandcamp "free-download" tag:** combined with psytrance, goa-trance and darkpsy, so you get a focused feed of free and name-your-price releases.
+- **Bandcamp labels you follow:** Zenon, Looney Moon, Deepnotic, plus HOMmega, Blue Tunes, Sacred Technology, Moonity, TimeLapse, Iboga, Nano, TIP, Ovnimoon, IONO, Dacru, Profound, Occulta, Sangoma, Psygen, Arrábida and Enterrec. **Every** release shows on the **Labels** tab, at any price, with previews of every track; free and cheap ones also show on Free and Cheap. Edit the list under `bclabels:` in `config.yaml`.
 - **hearthis.at:** free-download psytrance and goa DJ mixes and tracks from DJs worldwide. You can preview them here; hearthis doesn't allow automated downloads, so the Get button opens the page.
 
 Every release with a known location shows it (🌍) and gets a country chip such as
@@ -53,6 +54,7 @@ the sources. Stop the app with `Ctrl+C`.
 | **Pulled** | Releases you've downloaded. 📂 opens the folder; 🗑 deletes a release's files. |
 | **Free** | Ektoplazm, Internet Archive netlabels, hearthis.at mixes, and Bandcamp free and name-your-price releases. |
 | **Cheap / On Sale** | Bandcamp releases at or under your price limit, converted to your currency. |
+| **Labels** | Everything from the Bandcamp labels you follow, newest first. Pick a label from the dropdown. |
 
 On each card: **▶ Play** plays a sample (one at a time), **⬇ Pull** downloads it (or
 **Get/Buy** opens Bandcamp), and **🔗** opens the release page. Use the search box and
@@ -120,6 +122,7 @@ app/
     hearthis.py    reads hearthis.at free-download mixes
     sonictantra.py reads Sonic Tantra free compilations
     audius.py      reads the Audius API
+    bandcamp_labels.py  reads the catalogues of Bandcamp labels you follow
 static/
   index.html       the page layout (Tailwind classes for styling)
   app.js           what the buttons do

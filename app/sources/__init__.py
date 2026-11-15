@@ -6,7 +6,7 @@ To add a new source, see the "Tinkering guide" in README.md:
   2. add it to SOURCES below,
   3. add a `mysource:` section under `sources:` in config.yaml.
 """
-from . import archive_org, audius, bandcamp, ektoplazm, hearthis, sonictantra
+from . import archive_org, audius, bandcamp, bandcamp_labels, ektoplazm, hearthis, sonictantra
 
 SOURCES = {
     "ektoplazm": ektoplazm,
@@ -15,4 +15,5 @@ SOURCES = {
     "hearthis": hearthis,
     "sonictantra": sonictantra,
     "audius": audius,
+    "bclabels": bandcamp_labels,
 }

@@ -136,9 +136,12 @@ def _to_json(r: Release) -> dict:
 
 
 @app.get("/api/releases")
-def releases(bucket: str = "free", q: str = "", tag: str = "", source: str = ""):
+def releases(bucket: str = "free", q: str = "", tag: str = "", source: str = "",
+             label: str = ""):
     stmt = select(Release)
-    if bucket == "pulled":
+    if bucket == "labels":   # everything from the Bandcamp labels you follow, any price
+        stmt = stmt.where(Release.source == "bclabels").order_by(col(Release.released).desc())
+    elif bucket == "pulled":
         stmt = stmt.where(Release.pulled == True).order_by(col(Release.pulled_at).desc())  # noqa: E712
     elif bucket == "cheap":
         stmt = stmt.where(Release.price_kind == "cheap").order_by(col(Release.price_home))
@@ -153,8 +156,34 @@ def releases(bucket: str = "free", q: str = "", tag: str = "", source: str = "")
         stmt = stmt.where(col(Release.tags).ilike(f"%{tag}%"))
     if source:
         stmt = stmt.where(Release.source == source)
+    if label:
+        stmt = stmt.where(Release.label == label)
     with Session(engine) as s:
         return [_to_json(r) for r in s.exec(stmt.limit(5000)).all()]
+
+
+@app.get("/api/tracks/{release_id}")
+async def fresh_tracks(release_id: str):
+    """Sample links for a release, re-read from its page if they've expired (Bandcamp labels)."""
+    with Session(engine) as s:
+        rel = s.get(Release, release_id)
+    if rel is None:
+        raise HTTPException(404, "Release not found")
+    tracks = json.loads(rel.tracks_json or "[]")
+    module = SOURCES.get(rel.source)
+    if hasattr(module, "refresh_tracks") and module.previews_expired(tracks):
+        client = PoliteClient()
+        try:
+            tracks = await module.refresh_tracks(client, rel) or tracks
+        finally:
+            await client.close()
+        with Session(engine) as s:
+            r = s.get(Release, release_id)
+            r.tracks_json = json.dumps(tracks)
+            r.stream_url = tracks[0] if tracks else ""
+            s.add(r)
+            s.commit()
+    return {"tracks": tracks}
 
 
 @app.get("/api/status")
@@ -166,9 +195,13 @@ def status():
         last_sync_ok = get_meta(s, "last_sync_ok")
     counts = Counter()
     tags = Counter()
+    labels = Counter()
     for r in rows:
         counts["pulled"] += r.pulled
         counts["cheap" if r.price_kind == "cheap" else "free"] += r.price_kind != "paid"
+        if r.source == "bclabels":
+            counts["labels"] += 1
+            labels[r.label] += 1
         tags.update(t for t in r.tags.split(",") if t)
     return {
         "refreshing": state["refreshing"],
@@ -182,6 +215,7 @@ def status():
         "download_bytes": downloader.folder_size(settings.download_dir),
         "counts": counts,
         "tags": [t for t, _ in tags.most_common(24)],
+        "labels": sorted(labels),
         "home_currency": settings.home_currency,
         "cheap_threshold": settings.cheap_threshold,
     }
