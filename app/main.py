@@ -20,6 +20,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlmodel import col, or_
 
 from . import downloader
+from .catalog import CATALOG, export_catalog, import_catalog
 from .config import ROOT, load_settings
 from .db import Release, Session, engine, get_meta, init_db, select, set_meta, upsert_release, utcnow
 from .polite import PoliteClient
@@ -66,6 +67,12 @@ async def refresh(force: bool = False) -> None:
                 state["last_errors"][name] = str(e)
         with Session(engine) as s:
             set_meta(s, "last_refresh", utcnow().isoformat())
+        # Save everything we know, so a fresh install doesn't have to read it all again.
+        try:
+            n = await asyncio.to_thread(export_catalog)
+            log.info("Saved %d releases to %s", n, CATALOG)
+        except OSError as e:
+            log.warning("Could not save the catalogue file: %s", e)
     except Exception:
         log.exception("Refresh failed")
     finally:
@@ -107,6 +114,9 @@ def _save(source: str, releases: list[Release], started) -> None:
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     init_db()
+    added = import_catalog()   # first start: load the saved catalogue instead of re-reading pages
+    if added:
+        log.info("Loaded %d releases from %s", added, CATALOG)
     settings.download_dir.mkdir(parents=True, exist_ok=True)
     scheduler.add_job(refresh, "interval", hours=settings.refresh_hours, id="refresh")
     scheduler.start()

@@ -77,6 +77,28 @@ edit it. Restart the app after changing it.
 | `rclone_remote`, `rclone_mode` | Google Drive sync (below) |
 | `sources:` | Turn sources on or off; pick Ektoplazm styles and Bandcamp tags |
 
+## The catalogue file (`data/catalog.csv`)
+
+Reading thousands of release pages the first time takes a while, so after every
+refresh Atomizer saves every release's details (artist, title, label, country, styles,
+price, cover, links, sample links) to **`data/catalog.csv`**. It opens in Excel or
+Google Sheets.
+
+The file is part of the repo, so a fresh copy of Atomizer **loads it on first start**
+and is ready straight away. Refreshes then only read releases that are new. Your own
+state (what you pulled and where it's saved) is never written to it.
+
+To update it in the repo after a refresh, commit `data/catalog.csv`. You can also run
+it by hand:
+
+```bash
+python -m app.catalog export
+```
+
+```bash
+python -m app.catalog import
+```
+
 ## Google Drive sync (optional)
 
 Atomizer uses [rclone](https://rclone.org) to copy your downloads folder to Drive.
