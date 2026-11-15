@@ -108,3 +108,11 @@ def test_single_file_names():
     assert _filename("https://x/download?a=1", h, "x") == "OM Primordial [144] - [KaLiu].mp3"
     assert _filename("https://x/files/Some%20Album.rar", {}, "x") == "Some Album.rar"
     assert _filename("https://x/stream", {"content-type": "audio/mpeg"}, "A - B") == "A - B.mp3"
+
+
+def test_sonictantra_mega_release_links_out():
+    url = "https://sonictantra.com/download-release/mad-powers/"
+    rel = parse_release(text("sonictantra_release_mega.html"), url)
+    assert rel is not None and rel.id == "st-mad-powers"
+    assert not rel.can_pull          # mega.nz: open the page instead
+    assert rel.page_url == url

@@ -38,7 +38,7 @@ def _long(path: Path) -> str:
 
 
 def _extract(zip_path: Path, dest: Path) -> int:
-    dest.mkdir(parents=True, exist_ok=True)
+    os.makedirs(_long(dest), exist_ok=True)
     root = dest.resolve()
     count = 0
     with zipfile.ZipFile(zip_path) as z:
@@ -75,7 +75,7 @@ async def pull(url: str, dest: Path, name_hint: str = "") -> AsyncIterator[dict]
 
     Zips are unpacked into `dest`; anything else (a single track, a .rar) is saved as one file.
     """
-    dest.parent.mkdir(parents=True, exist_ok=True)
+    os.makedirs(_long(dest.parent), exist_ok=True)
     tmp = dest.parent / (dest.name + ".part")
     yield {"stage": "start", "url": url}
     async with httpx.AsyncClient(headers={"User-Agent": USER_AGENT},
@@ -103,11 +103,12 @@ async def pull(url: str, dest: Path, name_hint: str = "") -> AsyncIterator[dict]
             files = await asyncio.to_thread(_extract, tmp, dest)
             tmp.unlink(missing_ok=True)
         else:  # a single track or a .rar: keep it as one file
-            dest.mkdir(parents=True, exist_ok=True)
+            os.makedirs(_long(dest), exist_ok=True)
             os.replace(_long(tmp), _long(dest / _filename(url, headers, name_hint or dest.name)))
             files = 1
     except Exception:
-        tmp.unlink(missing_ok=True)
+        if os.path.exists(_long(tmp)):
+            os.remove(_long(tmp))
         raise
     yield {"stage": "done", "files": files, "path": str(dest)}
 

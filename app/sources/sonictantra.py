@@ -1,9 +1,10 @@
 """Sonic Tantra (sonictantra.com): an Indian dark/hi-tech/psycore label.
 
 Its "free compilations" page lists free albums from Sonic Tantra and friendly
-labels around the world. Each album page has direct MP3 and WAV zip links, so
-Atomizer can pull them. There are no sample files (only SoundCloud embeds), so
-the Play button is off for these; open the page to listen.
+labels around the world. Newer album pages have direct MP3/WAV zip links, so
+Atomizer can pull them; older ones are on mega.nz, so those cards open the page.
+There are no sample files (only SoundCloud embeds), so the Play button is off
+for these; open the page to listen.
 """
 from __future__ import annotations
 
@@ -53,8 +54,12 @@ def parse_release(html: str, page_url: str, cover_hint: str = "") -> Release | N
     mp3 = next((z for z in zips if "mp3" in z.lower()), "")
     lossless = next((z for z in zips if "flac" in z.lower()), "") or \
         next((z for z in zips if "wav" in z.lower()), "")
-    if not (mp3 or lossless):
-        return None  # nothing we can download (maybe moved to another site)
+    hosted_elsewhere = any(h in a["href"] for a in soup.select("a[href]")
+                           for h in ("mega.nz", "drive.google", "mediafire", "bandcamp.com/album"))
+    if not (mp3 or lossless or hosted_elsewhere):
+        return None  # no download offered at all
+    # Many older albums are on mega.nz: those can't be pulled automatically,
+    # so they show "Get" and open the album page instead.
 
     # "Hanuman's Goa Friends Vol. 3 (2026, PsyWorld Records)"
     title, year, label = full_title, "", "Sonic Tantra"
