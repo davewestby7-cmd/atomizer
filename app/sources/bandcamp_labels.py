@@ -27,29 +27,44 @@ from .bandcamp import classify
 log = logging.getLogger(__name__)
 
 
-def _label_cfg(entry) -> tuple[str, int]:
-    """Config entries are 'zenonrecords' or {name: zenonrecords, max_albums: 200}."""
+def _label_cfg(entry, default_max: int) -> tuple[str, int]:
+    """Config entries are 'zenonrecords' or {name: zenonrecords, max_albums: 0}.
+
+    max_albums: newest N releases to read; 0 means the whole catalogue.
+    """
     if isinstance(entry, dict):
-        return str(entry["name"]), int(entry.get("max_albums", 0))
-    return str(entry), 0
+        return str(entry["name"]), int(entry.get("max_albums", default_max))
+    return str(entry), default_max
 
 
-def parse_music_page(html: str) -> tuple[str, list[str]]:
-    """A label's /music page -> (label name, album/track paths newest first)."""
+_RELEASE = r'(?:https://[a-z0-9-]+\.bandcamp\.com)?/(?:album|track)/[^"?#&]+'
+
+
+def _full_url(link: str, base: str) -> str:
+    """Labels often list releases that live on the artist's own Bandcamp page."""
+    link = htmllib.unescape(link).split("?", 1)[0]
+    return link if link.startswith("http") else base + link
+
+
+def parse_music_page(html: str, base: str) -> tuple[str, list[str]]:
+    """A label's /music page -> (label name, release URLs newest first)."""
     name = ""
     m = re.search(r'<meta property="og:site_name" content="([^"]+)"', html) or \
         re.search(r"<title>[^|<]*\|\s*([^<]+)</title>", html)
     if m:
         name = htmllib.unescape(m.group(1)).strip()
-    paths = re.findall(r'href="(/(?:album|track)/[^"?#]+)"', html)
+    # The newest releases are in the page itself; only look inside the music grid.
+    start = html.find('id="music-grid"')
+    grid = html[start:html.find("</ol>", start)] if start >= 0 else html
+    links = re.findall(r'href="(' + _RELEASE + r')[^"]*"', grid)
     m = re.search(r'data-client-items="([^"]*)"', html)
     if m:  # the rest of the catalogue, loaded by Bandcamp's own page script
         try:
-            paths += [i["page_url"] for i in json.loads(htmllib.unescape(m.group(1)))
+            links += [i["page_url"] for i in json.loads(htmllib.unescape(m.group(1)))
                       if i.get("page_url")]
         except ValueError:
             pass
-    return name, list(dict.fromkeys(paths))
+    return name, list(dict.fromkeys(_full_url(link, base) for link in links))
 
 
 def _tralbum(html: str) -> dict:
@@ -136,22 +151,20 @@ async def fetch(client, settings, known=None) -> list[Release]:
     default_max = int(cfg.get("max_albums", 60))          # newest N per label (0 = all)
     rates = await get_rates(settings.home_currency)
     out: dict[str, Release] = {}
+    by_url = {k.page_url: k for k in known.values()}
 
     for entry in cfg.get("labels", []):
-        sub, max_albums = _label_cfg(entry)
-        max_albums = max_albums or default_max
+        sub, max_albums = _label_cfg(entry, default_max)
         base = f"https://{sub}.bandcamp.com"
         try:
             r = await client.get(f"{base}/music")
         except Exception as e:
             log.warning("Bandcamp label %s: %s", sub, e)
             continue
-        label, paths = parse_music_page(r.text)
+        label, urls = parse_music_page(r.text, base)
         if max_albums > 0:
-            paths = paths[:max_albums]
-        by_url = {k.page_url: k for k in known.values() if k.page_url.startswith(base)}
-        for path in paths:
-            url = base + path
+            urls = urls[:max_albums]
+        for url in urls:
             cached = by_url.get(url)
             if cached:
                 out[cached.id] = cached

@@ -16,11 +16,12 @@ def text(name):
 
 
 def test_music_page_lists_whole_catalogue():
-    name, paths = bcl.parse_music_page(text("bclabel_zenon_music.html"))
+    base = "https://zenonrecords.bandcamp.com"
+    name, paths = bcl.parse_music_page(text("bclabel_zenon_music.html"), base)
     assert name == "Zenon Records"
     assert len(paths) > 400                       # grid + the rest of the catalogue
-    assert paths[:2] == ["/album/remember", "/album/unresolved"]   # newest first (Nov, Oct 2026)
-    assert "/album/an-appeal-to-geometry" in paths                  # older ones follow
+    assert paths[:2] == [base + "/album/remember", base + "/album/unresolved"]  # newest first
+    assert base + "/album/an-appeal-to-geometry" in paths                        # older ones follow
     assert len(paths) == len(set(paths))
 
 
@@ -86,3 +87,19 @@ def test_fetch_limits_and_reuses(monkeypatch):
     client2 = FakeClient(pages)
     asyncio.run(bcl.fetch(client2, s, known=known))
     assert base + "/album/remember" not in client2.requests
+
+
+def test_releases_on_artist_pages_keep_their_own_address():
+    html = ('<ol id="music-grid"><li><a href="https://jimigreenlooneymoon.bandcamp.com/album/'
+            'catch-a-buzz?label=1&amp;tab=music">x</a></li><li><a href="/album/own">y</a></li></ol>'
+            '<ol data-client-items="[{&quot;page_url&quot;:&quot;https://dustlooneymoon.bandcamp.com'
+            '/album/thirteen?label=1&amp;tab=music&quot;}]"></ol>')
+    _, urls = bcl.parse_music_page(html, "https://looneymoonrecords.bandcamp.com")
+    assert urls == ["https://jimigreenlooneymoon.bandcamp.com/album/catch-a-buzz",
+                    "https://looneymoonrecords.bandcamp.com/album/own",
+                    "https://dustlooneymoon.bandcamp.com/album/thirteen"]
+
+
+def test_whole_catalogue_setting():
+    assert bcl._label_cfg({"name": "zenonrecords", "max_albums": 0}, 60) == ("zenonrecords", 0)
+    assert bcl._label_cfg("hommega", 60) == ("hommega", 60)
