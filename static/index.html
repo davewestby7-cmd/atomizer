@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PsyPull</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <style>
+    :root { --glow: 0 0 18px rgba(168, 85, 247, .35), 0 0 40px rgba(20, 184, 166, .12); }
+    body {
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(124, 58, 237, .25), transparent 60%),
+        radial-gradient(900px 500px at 110% 10%, rgba(13, 148, 136, .22), transparent 60%),
+        #07050f;
+      min-height: 100vh;
+    }
+    .glow { box-shadow: var(--glow); }
+    .title-grad {
+      background: linear-gradient(90deg, #c084fc, #22d3ee, #a3e635, #f472b6, #c084fc);
+      background-size: 300% 100%;
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      animation: shift 12s linear infinite;
+    }
+    @keyframes shift { to { background-position: 300% 0; } }
+    .card { transition: transform .15s ease, box-shadow .15s ease; }
+    .card:hover { transform: translateY(-3px); box-shadow: var(--glow); }
+    .playing { outline: 2px solid #22d3ee; box-shadow: 0 0 24px rgba(34, 211, 238, .45); }
+    .tab-active { background: linear-gradient(90deg, rgba(168,85,247,.35), rgba(20,184,166,.35)); color: #fff; }
+    .bar { background: linear-gradient(90deg, #a855f7, #22d3ee); }
+  </style>
+</head>
+<body class="text-slate-200 antialiased">
+  <header class="sticky top-0 z-20 backdrop-blur bg-[#07050f]/80 border-b border-violet-900/40">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center gap-3">
+      <h1 class="text-2xl font-black tracking-tight title-grad mr-2">PsyPull</h1>
+
+      <input id="search" type="search" placeholder="Search artist, title, label…"
+        class="flex-1 min-w-[180px] bg-slate-900/70 border border-violet-800/50 rounded-lg px-3 py-2 text-sm
+               focus:outline-none focus:ring-2 focus:ring-teal-400/60">
+
+      <button id="refreshBtn" class="px-3 py-2 rounded-lg text-sm bg-violet-700/60 hover:bg-violet-600 glow">
+        ↻ Refresh sources
+      </button>
+      <button id="syncBtn" class="px-3 py-2 rounded-lg text-sm bg-teal-700/60 hover:bg-teal-600">
+        ☁ Sync to Drive
+      </button>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 pb-3 flex flex-wrap items-center gap-2 text-xs">
+      <nav id="tabs" class="flex gap-1 bg-slate-900/60 rounded-lg p-1 mr-2">
+        <button data-bucket="pulled" class="tab px-3 py-1.5 rounded-md">Pulled <span class="opacity-60" data-count="pulled"></span></button>
+        <button data-bucket="free" class="tab px-3 py-1.5 rounded-md">Free <span class="opacity-60" data-count="free"></span></button>
+        <button data-bucket="cheap" class="tab px-3 py-1.5 rounded-md">Cheap / On Sale <span class="opacity-60" data-count="cheap"></span></button>
+      </nav>
+      <div id="chips" class="flex flex-wrap gap-1"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 pb-2 flex flex-wrap gap-x-5 gap-y-1 text-[11px] text-slate-400">
+      <span id="refreshInfo"></span>
+      <span id="syncInfo"></span>
+      <span id="folderInfo"></span>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    <div id="pulledBar" class="hidden mb-4 flex flex-wrap items-center gap-3 text-sm bg-slate-900/60 border border-violet-900/40 rounded-lg px-4 py-3">
+      <span class="text-slate-400">Saved in</span>
+      <code id="pulledPath" class="text-teal-300 break-all"></code>
+      <button id="openFolderBtn" class="ml-auto px-3 py-1.5 rounded-md bg-slate-800 hover:bg-slate-700">📂 Open folder</button>
+    </div>
+    <div id="notice" class="hidden mb-4 text-sm rounded-lg px-4 py-3 border"></div>
+    <div id="grid" class="grid gap-5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"></div>
+    <p id="empty" class="hidden text-center text-slate-500 py-20"></p>
+  </main>
+
+  <audio id="player" preload="none"></audio>
+
+  <template id="cardTpl">
+    <article class="card rounded-xl overflow-hidden bg-slate-900/70 border border-violet-900/40 flex flex-col">
+      <div class="relative aspect-square bg-slate-800">
+        <img class="cover w-full h-full object-cover" loading="lazy" alt="">
+        <span class="price absolute bottom-3 right-2 shadow-lgtext-[11px] font-bold px-2 py-0.5 rounded-full"></span>
+        <span class="source absolute top-2 left-2 text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-black/60"></span>
+        <div class="progress hidden absolute bottom-0 inset-x-0 h-1.5 bg-black/60"><div class="bar h-full w-0"></div></div>
+      </div>
+      <div class="p-3 flex flex-col gap-1 flex-1">
+        <p class="artist text-xs text-teal-300 truncate"></p>
+        <h2 class="title text-sm font-semibold leading-snug line-clamp-2"></h2>
+        <p class="meta text-[11px] text-slate-500 truncate"></p>
+        <div class="mt-auto pt-2 flex gap-1.5">
+          <button class="play flex-1 text-xs px-2 py-1.5 rounded-md bg-violet-800/60 hover:bg-violet-700" title="Play sample">▶ Play</button>
+          <button class="pull flex-1 text-xs px-2 py-1.5 rounded-md bg-teal-800/60 hover:bg-teal-700">⬇ Pull</button>
+          <a class="open text-xs px-2 py-1.5 rounded-md bg-slate-800 hover:bg-slate-700" target="_blank" rel="noopener" title="Open page">🔗</a>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

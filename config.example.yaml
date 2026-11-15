@@ -1,0 +1,37 @@
+# PsyPull settings. Copy this file to config.yaml and change what you like.
+# (config.yaml is ignored by git, so your personal settings stay private.)
+
+# Where pulled releases are saved. Relative paths are relative to the project folder.
+download_dir: downloads
+
+# Which format to pull from Ektoplazm: mp3 or flac
+download_format: mp3
+
+# Anything at or below this price (in your home currency) shows on the Cheap tab.
+home_currency: AUD
+cheap_threshold: 5.0
+
+# How often sources are re-checked in the background, in hours.
+# Pressing "Refresh sources" always checks right away.
+refresh_hours: 6
+
+# Google Drive sync via rclone (https://rclone.org). Leave rclone_remote empty to switch it off.
+# Example: "gdrive:PsyPull" means the remote called "gdrive", folder "PsyPull".
+rclone_remote: ""
+# sync = make Drive an exact mirror (deleting a release here deletes it on Drive too)
+# copy = only ever add files to Drive, never delete
+rclone_mode: copy
+
+sources:
+  ektoplazm:
+    enabled: true
+    # Style pages to read (each one is https://ektoplazm.com/style/<name>)
+    styles: [goa, full-on, darkpsy, forest, progressive, twilight, psycore, hi-tech,
+             morning, zenonesque, techtrance, psy-dub, downtempo]
+
+  bandcamp:
+    enabled: true
+    # Bandcamp tags to browse
+    tags: [psytrance, psychedelic-trance, goa-trance, darkpsy, forest]
+    # How many results to read per tag (Bandcamp returns up to 60 per page)
+    per_tag: 120
