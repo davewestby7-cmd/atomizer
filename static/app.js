@@ -72,7 +72,7 @@ function renderChips() {
   box.innerHTML = "";
   const src = document.createElement("select");
   src.className = "bg-slate-900/80 border border-violet-800/60 rounded-full px-2 py-1 text-slate-300";
-  for (const [v, label] of [["", "all sources"], ["ektoplazm", "Ektoplazm"], ["bandcamp", "Bandcamp"], ["archive", "Internet Archive"], ["hearthis", "hearthis.at mixes"]]) {
+  for (const [v, label] of [["", "all sources"], ["ektoplazm", "Ektoplazm"], ["bandcamp", "Bandcamp"], ["archive", "Internet Archive"], ["hearthis", "hearthis.at mixes"], ["sonictantra", "Sonic Tantra"], ["audius", "Audius"]]) {
     src.add(new Option(label, v, false, view.source === v));
   }
   src.onchange = () => { view.source = src.value; loadReleases(); };

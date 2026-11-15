@@ -56,7 +56,7 @@ def parse_tracks(items: list[dict], genre: str) -> list[Release]:
     return out
 
 
-async def fetch(client, settings) -> list[Release]:
+async def fetch(client, settings, known=None) -> list[Release]:
     cfg = settings.source("hearthis")
     pages = int(cfg.get("pages", 2))
     found: dict[str, Release] = {}

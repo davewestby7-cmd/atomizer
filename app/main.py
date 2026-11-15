@@ -56,7 +56,9 @@ async def refresh(force: bool = False) -> None:
                 continue
             started = utcnow()
             try:
-                releases = await module.fetch(client, settings)
+                # Releases we already have, so sources can skip re-reading their pages.
+                known = _known(name)
+                releases = await module.fetch(client, settings, known=known)
                 log.info("%s: %d releases", name, len(releases))
                 _save(name, releases, started)
             except Exception as e:  # one broken source shouldn't stop the others
@@ -69,6 +71,12 @@ async def refresh(force: bool = False) -> None:
     finally:
         await client.close()
         state["refreshing"] = False
+
+
+def _known(source: str) -> dict[str, Release]:
+    with Session(engine) as s:
+        rows = s.exec(select(Release).where(Release.source == source)).all()
+        return {r.id: Release.model_validate(r.model_dump()) for r in rows}
 
 
 def country_of(origin: str) -> str:
@@ -219,7 +227,8 @@ async def pull(release_id: str):
     async def events():
         state["pulling"].add(release_id)
         try:
-            async for ev in downloader.pull(url, dest):
+            name = f"{rel.artist} - {rel.title}" if rel.artist else rel.title
+            async for ev in downloader.pull(url, dest, name_hint=name):
                 if ev["stage"] == "done":
                     with Session(engine) as s:
                         r = s.get(Release, release_id)

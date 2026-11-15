@@ -84,7 +84,8 @@ async def _browse(client, tag, geoname_id, limit, rates, threshold, found) -> No
     cursor, seen = "*", 0
     while seen < limit and cursor:
         body = {
-            "category_id": 0, "tag_norm_names": [tag], "geoname_id": geoname_id,
+            # "psytrance+free-download" means releases with BOTH tags
+            "category_id": 0, "tag_norm_names": tag.split("+"), "geoname_id": geoname_id,
             "slice": "new", "cursor": cursor, "size": min(PAGE_SIZE, limit - seen),
             "include_result_types": ["a", "s"],
         }
@@ -94,12 +95,12 @@ async def _browse(client, tag, geoname_id, limit, rates, threshold, found) -> No
         except Exception as e:
             log.warning("Bandcamp: tag %s (place %s) failed: %s", tag, geoname_id, e)
             return
-        batch = parse_discover(data, tag, rates, threshold)
+        batch = parse_discover(data, tag.replace("+", ","), rates, threshold)
         if not batch:
             return
         for rel in batch:
             if rel.id in found:
-                tags = dict.fromkeys(found[rel.id].tags.split(",") + [tag])
+                tags = dict.fromkeys(found[rel.id].tags.split(",") + tag.split("+"))
                 found[rel.id].tags = ",".join(tags)
             else:
                 found[rel.id] = rel
@@ -107,7 +108,7 @@ async def _browse(client, tag, geoname_id, limit, rates, threshold, found) -> No
         cursor = data.get("cursor")
 
 
-async def fetch(client, settings, rates: dict[str, float] | None = None) -> list[Release]:
+async def fetch(client, settings, known=None, rates: dict[str, float] | None = None) -> list[Release]:
     from ..currency import get_rates
 
     cfg = settings.source("bandcamp")

@@ -8,6 +8,7 @@ import shutil
 import zipfile
 from collections.abc import AsyncIterator
 from pathlib import Path
+from urllib.parse import unquote, urlsplit
 
 import httpx
 
@@ -54,8 +55,26 @@ def _extract(zip_path: Path, dest: Path) -> int:
     return count
 
 
-async def pull(url: str, dest: Path) -> AsyncIterator[dict]:
-    """Download `url` into `dest`, yielding progress events as dicts."""
+def _filename(url: str, headers, fallback: str) -> str:
+    """Best name for a single (non-zip) file: server's name, else the URL's, else fallback."""
+    cd = headers.get("content-disposition") or ""
+    m = re.search(r"filename\*=UTF-8''([^;]+)", cd) or re.search(r'filename="?([^";]+)"?', cd)
+    if m:
+        return safe_name(unquote(m.group(1)))
+    last = unquote(urlsplit(url).path.rsplit("/", 1)[-1])
+    if "." in last:
+        return safe_name(last)
+    ext = {"audio/mpeg": ".mp3", "audio/flac": ".flac", "audio/wav": ".wav",
+           "audio/x-wav": ".wav", "audio/ogg": ".ogg"}.get(
+        (headers.get("content-type") or "").split(";")[0].strip(), "")
+    return safe_name(fallback) + ext
+
+
+async def pull(url: str, dest: Path, name_hint: str = "") -> AsyncIterator[dict]:
+    """Download `url` into `dest`, yielding progress events as dicts.
+
+    Zips are unpacked into `dest`; anything else (a single track, a .rar) is saved as one file.
+    """
     dest.parent.mkdir(parents=True, exist_ok=True)
     tmp = dest.parent / (dest.name + ".part")
     yield {"stage": "start", "url": url}
@@ -63,26 +82,29 @@ async def pull(url: str, dest: Path) -> AsyncIterator[dict]:
                                  follow_redirects=True, timeout=60) as client:
         async with client.stream("GET", url) as r:
             r.raise_for_status()
-            total = int(r.headers.get("content-length") or 0)
+            headers = r.headers
+            total = int(headers.get("content-length") or 0)
             done = 0
-            last_pct = -1
-            with open(tmp, "wb") as f:
+            last = -1
+            with open(_long(tmp), "wb") as f:
                 async for chunk in r.aiter_bytes(256 * 1024):
                     f.write(chunk)
                     done += len(chunk)
-                    pct = int(done * 100 / total) if total else -1
-                    if pct != last_pct:
-                        last_pct = pct
-                        yield {"stage": "download", "bytes": done, "total": total, "percent": pct}
+                    # percent when the size is known, otherwise every ~2 MB
+                    mark = int(done * 100 / total) if total else done // (2 * 1024 * 1024)
+                    if mark != last:
+                        last = mark
+                        yield {"stage": "download", "bytes": done, "total": total,
+                               "percent": mark if total else -1}
 
     yield {"stage": "unzip"}
     try:
         if zipfile.is_zipfile(tmp):
             files = await asyncio.to_thread(_extract, tmp, dest)
             tmp.unlink(missing_ok=True)
-        else:  # not a zip (e.g. a .rar): keep the archive as-is
+        else:  # a single track or a .rar: keep it as one file
             dest.mkdir(parents=True, exist_ok=True)
-            tmp.replace(dest / safe_name(url.rsplit("/", 1)[-1].replace("%20", " ")))
+            os.replace(_long(tmp), _long(dest / _filename(url, headers, name_hint or dest.name)))
             files = 1
     except Exception:
         tmp.unlink(missing_ok=True)

@@ -28,11 +28,19 @@ sources:
     # Style pages to read (each one is https://ektoplazm.com/style/<name>)
     styles: [goa, full-on, darkpsy, forest, progressive, twilight, psycore, hi-tech,
              morning, zenonesque, techtrance, psy-dub, downtempo]
+    # Country pages (https://ektoplazm.com/region/<name>). Israel first so it fills first.
+    regions: [israel, india, brazil, japan, mexico, greece, russia, south-africa, australia,
+              portugal, germany, united-kingdom, finland, serbia, hungary, argentina, ukraine, turkey]
+    # Country pages only show thumbnails, so each new release's page is read once.
+    # This caps how many new pages are read per refresh (1 per second); the rest come next time.
+    max_new_per_refresh: 150
 
   bandcamp:
     enabled: true
     # Bandcamp tags to browse (worldwide)
-    tags: [psytrance, psychedelic-trance, goa-trance, darkpsy, forest]
+    # "a+b" means releases tagged with both, e.g. psytrance+free-download
+    tags: [psytrance, psychedelic-trance, goa-trance, darkpsy, forest,
+           psytrance+free-download, goa-trance+free-download, darkpsy+free-download]
     # How many results to read per tag (Bandcamp returns up to 60 per page)
     per_tag: 120
     # Country scenes. geoname_id comes from geonames.org (search the country,
@@ -74,3 +82,15 @@ sources:
     enabled: true
     genres: [psytrance, goa]
     pages: 2
+
+  sonictantra:
+    # Sonic Tantra (India): free dark/hi-tech/psycore compilations, direct zip downloads
+    enabled: true
+    max_new_per_refresh: 60
+
+  audius:
+    # Audius: full-length tracks and sets worldwide (open API, no key needed).
+    # Only tracks the artist made freely downloadable can be pulled.
+    enabled: true
+    queries: [psytrance, goa trance, darkpsy, forest psytrance, full on psytrance, hi-tech psytrance, israel psytrance]
+    per_query: 50

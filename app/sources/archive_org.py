@@ -92,7 +92,7 @@ def parse_item(doc: dict, meta: dict) -> Release:
     )
 
 
-async def fetch(client, settings) -> list[Release]:
+async def fetch(client, settings, known=None) -> list[Release]:
     cfg = settings.source("archive")
     params = {
         "q": build_query(cfg.get("subjects") or DEFAULT_SUBJECTS),
@@ -103,7 +103,12 @@ async def fetch(client, settings) -> list[Release]:
     }
     r = await client.get(SEARCH_URL, params=params)
     out = []
+    known = known or {}
     for doc in parse_search(r.json()):
+        cached = known.get(f"ia-{doc['identifier']}")
+        if cached and cached.tracks_json != "[]":  # already read its file list before
+            out.append(cached)
+            continue
         try:
             meta = (await client.get(META_URL.format(id=doc["identifier"]))).json()
             out.append(parse_item(doc, meta))
