@@ -6,6 +6,12 @@ can optionally sync that folder to Google Drive.
 
 - **Ektoplazm** (ektoplazm.com) is a free Creative Commons psytrance netlabel. Every release is free, and Atomizer downloads and unzips it for you.
 - **Bandcamp** tag feeds (psytrance, psychedelic-trance, goa-trance, darkpsy, forest) are sorted into **Free**, **Name Your Price** and **Cheap** (≤ AUD 5 by default). Downloads and purchases happen on Bandcamp's own page, so those cards link out.
+- **Bandcamp country scenes:** the same feed, filtered to one country. 🇮🇱 **Israel** gets the deepest search (psytrance, goa, progressive, full-on, darkpsy), then India, Brazil, Japan, Mexico, Greece, South Africa and Australia. You can add any country in `config.yaml`.
+- **Internet Archive netlabels** (archive.org/details/netlabels): Creative Commons releases from small labels worldwide. Free, and Atomizer pulls them for you.
+- **hearthis.at:** free-download psytrance and goa DJ mixes and tracks from DJs worldwide. You can preview them here; hearthis doesn't allow automated downloads, so the Get button opens the page.
+
+Every release with a known location shows it (🌍) and gets a country chip such as
+**israel**, so you can filter by scene. The search box also matches places.
 
 No YouTube or Spotify ripping, no accounts, no paywalled content. Atomizer obeys each
 site's `robots.txt`, waits at least 1 second between requests, and only re-checks
@@ -42,7 +48,7 @@ the sources. Stop the app with `Ctrl+C`.
 | Tab | What's there |
 |---|---|
 | **Pulled** | Releases you've downloaded. 📂 opens the folder; 🗑 deletes a release's files. |
-| **Free** | Ektoplazm releases plus Bandcamp free and name-your-price releases. |
+| **Free** | Ektoplazm, Internet Archive netlabels, hearthis.at mixes, and Bandcamp free and name-your-price releases. |
 | **Cheap / On Sale** | Bandcamp releases at or under your price limit, converted to your currency. |
 
 On each card: **▶ Play** plays a sample (one at a time), **⬇ Pull** downloads it (or
@@ -106,7 +112,9 @@ app/
   sources/
     __init__.py    list of sources
     ektoplazm.py   reads Ektoplazm pages
-    bandcamp.py    reads Bandcamp tag feeds
+    bandcamp.py    reads Bandcamp tag feeds (worldwide + country scenes)
+    archive_org.py reads Internet Archive netlabels
+    hearthis.py    reads hearthis.at free-download mixes
 static/
   index.html       the page layout (Tailwind classes for styling)
   app.js           what the buttons do

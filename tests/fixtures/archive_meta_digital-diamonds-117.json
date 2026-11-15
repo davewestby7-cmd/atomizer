@@ -1,0 +1,46 @@
+{
+ "metadata": {
+  "identifier": "digital-diamonds-117",
+  "title": "[DigitalDiamonds117] L-maghreb - Desert Heartbeat EP",
+  "creator": null,
+  "date": "2026-11-12"
+ },
+ "files": [
+  {
+   "name": "[DigitalDiamonds117]_A1_L-maghreb_-_Desert_Heartbeat.wav",
+   "format": "WAVE"
+  },
+  {
+   "name": "[DigitalDiamonds117]_B1_L-maghreb_-_Infinite_Tide.wav",
+   "format": "WAVE"
+  },
+  {
+   "name": "[DigitalDiamonds117]_L-maghreb_-_Desert_Heartbeat_EP.jpg",
+   "format": "JPEG"
+  },
+  {
+   "name": "[DigitalDiamonds117]_L-maghreb_-_Desert_Heartbeat_EP.txt",
+   "format": "Text"
+  },
+  {
+   "name": "__ia_thumb.jpg",
+   "format": "Item Tile"
+  },
+  {
+   "name": "digital-diamonds-117_archive.torrent",
+   "format": "Archive BitTorrent"
+  },
+  {
+   "name": "digital-diamonds-117_files.xml",
+   "format": "Metadata"
+  },
+  {
+   "name": "digital-diamonds-117_meta.sqlite",
+   "format": "Metadata"
+  },
+  {
+   "name": "digital-diamonds-117_meta.xml",
+   "format": "Metadata"
+  }
+ ]
+}

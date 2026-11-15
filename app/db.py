@@ -32,6 +32,8 @@ class Release(SQLModel, table=True):
     download_mp3: str = ""
     download_flac: str = ""
     released: str = ""
+    origin: str = ""                           # where the artist/label is, e.g. "Tel Aviv, Israel"
+    kind: str = "release"                      # "release" or "mix"
     fetched_at: datetime = Field(default_factory=utcnow)
     pulled: bool = Field(default=False, index=True)
     local_path: str = ""
@@ -53,7 +55,17 @@ engine = create_engine(
 
 
 def init_db(eng=None) -> None:
-    SQLModel.metadata.create_all(eng or engine)
+    eng = eng or engine
+    SQLModel.metadata.create_all(eng)
+    # Tiny migration: add any new columns to a database made by an older version.
+    with eng.begin() as conn:
+        have = {row[1] for row in conn.exec_driver_sql("PRAGMA table_info(release)")}
+        for col in Release.__table__.columns:
+            if col.name not in have:
+                kind = "TEXT" if col.type.python_type is str else "REAL"
+                default = "''" if kind == "TEXT" else "0"
+                conn.exec_driver_sql(
+                    f"ALTER TABLE release ADD COLUMN {col.name} {kind} DEFAULT {default}")
 
 
 def get_meta(session: Session, key: str, default: str = "") -> str:

@@ -1,0 +1,386 @@
+{
+ "metadata": {
+  "identifier": "pn242",
+  "title": "Crema [pn242]",
+  "creator": "Potenci\u00f3metro",
+  "date": "2025-04-08"
+ },
+ "files": [
+  {
+   "name": "__ia_thumb.jpg",
+   "format": "Item Tile"
+  },
+  {
+   "name": "pn242-cover-adelante.jpg",
+   "format": "JPEG"
+  },
+  {
+   "name": "pn242-cover-adelante_thumb.jpg",
+   "format": "JPEG Thumb"
+  },
+  {
+   "name": "pn242-cover-atras.jpg",
+   "format": "JPEG"
+  },
+  {
+   "name": "pn242-cover-atras_thumb.jpg",
+   "format": "JPEG Thumb"
+  },
+  {
+   "name": "pn242-cover-completa.jpg",
+   "format": "JPEG"
+  },
+  {
+   "name": "pn242-cover-completa_thumb.jpg",
+   "format": "JPEG Thumb"
+  },
+  {
+   "name": "pn242-crema-flac.zip",
+   "format": "ZIP"
+  },
+  {
+   "name": "pn242-crema-mp3.zip",
+   "format": "ZIP"
+  },
+  {
+   "name": "pn242.jpg",
+   "format": "JPEG"
+  },
+  {
+   "name": "pn242_01_potenciometro_un-componente-tan-simple.afpk",
+   "format": "Columbia Peaks"
+  },
+  {
+   "name": "pn242_01_potenciometro_un-componente-tan-simple.mp3",
+   "format": "320Kbps MP3"
+  },
+  {
+   "name": "pn242_01_potenciometro_un-componente-tan-simple.png",
+   "format": "PNG"
+  },
+  {
+   "name": "pn242_01_potenciometro_un-componente-tan-simple_spectrogram.png",
+   "format": "Spectrogram"
+  },
+  {
+   "name": "pn242_02_potenciometro_bano-quimico.afpk",
+   "format": "Columbia Peaks"
+  },
+  {
+   "name": "pn242_02_potenciometro_bano-quimico.mp3",
+   "format": "320Kbps MP3"
+  },
+  {
+   "name": "pn242_02_potenciometro_bano-quimico.png",
+   "format": "PNG"
+  },
+  {
+   "name": "pn242_02_potenciometro_bano-quimico_spectrogram.png",
+   "format": "Spectrogram"
+  },
+  {
+   "name": "pn242_03_potenciometro_en-la-carpa-todos-bailan.afpk",
+   "format": "Columbia Peaks"
+  },
+  {
+   "name": "pn242_03_potenciometro_en-la-carpa-todos-bailan.mp3",
+   "format": "320Kbps MP3"
+  },
+  {
+   "name": "pn242_03_potenciometro_en-la-carpa-todos-bailan.png",
+   "format": "PNG"
+  },
+  {
+   "name": "pn242_03_potenciometro_en-la-carpa-todos-bailan_spectrogram.png",
+   "format": "Spectrogram"
+  },
+  {
+   "name": "pn242_04_potenciometro_dynamic-light.afpk",
+   "format": "Columbia Peaks"
+  },
+  {
+   "name": "pn242_04_potenciometro_dynamic-light.mp3",
+   "format": "320Kbps MP3"
+  },
+  {
+   "name": "pn242_04_potenciometro_dynamic-light.png",
+   "format": "PNG"
+  },
+  {
+   "name": "pn242_04_potenciometro_dynamic-light_spectrogram.png",
+   "format": "Spectrogram"
+  },
+  {
+   "name": "pn242_05_potenciometro_8-subs.afpk",
+   "format": "Columbia Peaks"
+  },
+  {
+   "name": "pn242_05_potenciometro_8-subs.mp3",
+   "format": "320Kbps MP3"
+  },
+  {
+   "name": "pn242_05_potenciometro_8-subs.png",
+   "format": "PNG"
+  },
+  {
+   "name": "pn242_05_potenciometro_8-subs_spectrogram.png",
+   "format": "Spectrogram"
+  },
+  {
+   "name": "pn242_06_potenciometro_esto-no-es-un-club-hipico.afpk",
+   "format": "Columbia Peaks"
+  },
+  {
+   "name": "pn242_06_potenciometro_esto-no-es-un-club-hipico.mp3",
+   "format": "320Kbps MP3"
+  },
+  {
+   "name": "pn242_06_potenciometro_esto-no-es-un-club-hipico.png",
+   "format": "PNG"
+  },
+  {
+   "name": "pn242_06_potenciometro_esto-no-es-un-club-hipico_spectrogram.png",
+   "format": "Spectrogram"
+  },
+  {
+   "name": "pn242_07_potenciometro_perfumada.afpk",
+   "format": "Columbia Peaks"
+  },
+  {
+   "name": "pn242_07_potenciometro_perfumada.mp3",
+   "format": "320Kbps MP3"
+  },
+  {
+   "name": "pn242_07_potenciometro_perfumada.png",
+   "format": "PNG"
+  },
+  {
+   "name": "pn242_07_potenciometro_perfumada_spectrogram.png",
+   "format": "Spectrogram"
+  },
+  {
+   "name": "pn242_08_potenciometro_dancer-roadie.afpk",
+   "format": "Columbia Peaks"
+  },
+  {
+   "name": "pn242_08_potenciometro_dancer-roadie.mp3",
+   "format": "320Kbps MP3"
+  },
+  {
+   "name": "pn242_08_potenciometro_dancer-roadie.png",
+   "format": "PNG"
+  },
+  {
+   "name": "pn242_08_potenciometro_dancer-roadie_spectrogram.png",
+   "format": "Spectrogram"
+  },
+  {
+   "name": "pn242_09_potenciometro_pulsera.afpk",
+   "format": "Columbia Peaks"
+  },
+  {
+   "name": "pn242_09_potenciometro_pulsera.mp3",
+   "format": "320Kbps MP3"
+  },
+  {
+   "name": "pn242_09_potenciometro_pulsera.png",
+   "format": "PNG"
+  },
+  {
+   "name": "pn242_09_potenciometro_pulsera_spectrogram.png",
+   "format": "Spectrogram"
+  },
+  {
+   "name": "pn242_10_potenciometro_anna.afpk",
+   "format": "Columbia Peaks"
+  },
+  {
+   "name": "pn242_10_potenciometro_anna.mp3",
+   "format": "320Kbps MP3"
+  },
+  {
+   "name": "pn242_10_potenciometro_anna.png",
+   "format": "PNG"
+  },
+  {
+   "name": "pn242_10_potenciometro_anna_spectrogram.png",
+   "format": "Spectrogram"
+  },
+  {
+   "name": "pn242_11_potenciometro_escenarios.afpk",
+   "format": "Columbia Peaks"
+  },
+  {
+   "name": "pn242_11_potenciometro_escenarios.mp3",
+   "format": "320Kbps MP3"
+  },
+  {
+   "name": "pn242_11_potenciometro_escenarios.png",
+   "format": "PNG"
+  },
+  {
+   "name": "pn242_11_potenciometro_escenarios_spectrogram.png",
+   "format": "Spectrogram"
+  },
+  {
+   "name": "pn242_12_potenciometro_dandolo-todo.afpk",
+   "format": "Columbia Peaks"
+  },
+  {
+   "name": "pn242_12_potenciometro_dandolo-todo.mp3",
+   "format": "320Kbps MP3"
+  },
+  {
+   "name": "pn242_12_potenciometro_dandolo-todo.png",
+   "format": "PNG"
+  },
+  {
+   "name": "pn242_12_potenciometro_dandolo-todo_spectrogram.png",
+   "format": "Spectrogram"
+  },
+  {
+   "name": "pn242_13_potenciometro_m4u-aumentado.afpk",
+   "format": "Columbia Peaks"
+  },
+  {
+   "name": "pn242_13_potenciometro_m4u-aumentado.mp3",
+   "format": "320Kbps MP3"
+  },
+  {
+   "name": "pn242_13_potenciometro_m4u-aumentado.png",
+   "format": "PNG"
+  },
+  {
+   "name": "pn242_13_potenciometro_m4u-aumentado_spectrogram.png",
+   "format": "Spectrogram"
+  },
+  {
+   "name": "pn242_14_potenciometro_durazno.afpk",
+   "format": "Columbia Peaks"
+  },
+  {
+   "name": "pn242_14_potenciometro_durazno.mp3",
+   "format": "320Kbps MP3"
+  },
+  {
+   "name": "pn242_14_potenciometro_durazno.png",
+   "format": "PNG"
+  },
+  {
+   "name": "pn242_14_potenciometro_durazno_spectrogram.png",
+   "format": "Spectrogram"
+  },
+  {
+   "name": "pn242_15_potenciometro_dubitativo.afpk",
+   "format": "Columbia Peaks"
+  },
+  {
+   "name": "pn242_15_potenciometro_dubitativo.mp3",
+   "format": "320Kbps MP3"
+  },
+  {
+   "name": "pn242_15_potenciometro_dubitativo.png",
+   "format": "PNG"
+  },
+  {
+   "name": "pn242_15_potenciometro_dubitativo_spectrogram.png",
+   "format": "Spectrogram"
+  },
+  {
+   "name": "pn242_16_potenciometro_gods.afpk",
+   "format": "Columbia Peaks"
+  },
+  {
+   "name": "pn242_16_potenciometro_gods.mp3",
+   "format": "320Kbps MP3"
+  },
+  {
+   "name": "pn242_16_potenciometro_gods.png",
+   "format": "PNG"
+  },
+  {
+   "name": "pn242_16_potenciometro_gods_spectrogram.png",
+   "format": "Spectrogram"
+  },
+  {
+   "name": "pn242_17_potenciometro_un-poquino-mais-rapido-samba.afpk",
+   "format": "Columbia Peaks"
+  },
+  {
+   "name": "pn242_17_potenciometro_un-poquino-mais-rapido-samba.mp3",
+   "format": "320Kbps MP3"
+  },
+  {
+   "name": "pn242_17_potenciometro_un-poquino-mais-rapido-samba.png",
+   "format": "PNG"
+  },
+  {
+   "name": "pn242_17_potenciometro_un-poquino-mais-rapido-samba_spectrogram.png",
+   "format": "Spectrogram"
+  },
+  {
+   "name": "pn242_18_potenciometro_potentiometer.afpk",
+   "format": "Columbia Peaks"
+  },
+  {
+   "name": "pn242_18_potenciometro_potentiometer.mp3",
+   "format": "320Kbps MP3"
+  },
+  {
+   "name": "pn242_18_potenciometro_potentiometer.png",
+   "format": "PNG"
+  },
+  {
+   "name": "pn242_18_potenciometro_potentiometer_spectrogram.png",
+   "format": "Spectrogram"
+  },
+  {
+   "name": "pn242_19_potenciometro_shut-down.afpk",
+   "format": "Columbia Peaks"
+  },
+  {
+   "name": "pn242_19_potenciometro_shut-down.mp3",
+   "format": "320Kbps MP3"
+  },
+  {
+   "name": "pn242_19_potenciometro_shut-down.png",
+   "format": "PNG"
+  },
+  {
+   "name": "pn242_19_potenciometro_shut-down_spectrogram.png",
+   "format": "Spectrogram"
+  },
+  {
+   "name": "pn242_archive.torrent",
+   "format": "Archive BitTorrent"
+  },
+  {
+   "name": "pn242_files.xml",
+   "format": "Metadata"
+  },
+  {
+   "name": "pn242_info.txt",
+   "format": "Text"
+  },
+  {
+   "name": "pn242_info_english.txt",
+   "format": "Text"
+  },
+  {
+   "name": "pn242_meta.sqlite",
+   "format": "Metadata"
+  },
+  {
+   "name": "pn242_meta.xml",
+   "format": "Metadata"
+  },
+  {
+   "name": "pn242_rules.conf",
+   "format": "Derivation Rules"
+  },
+  {
+   "name": "pn242_thumb.jpg",
+   "format": "JPEG Thumb"
+  }
+ ]
+}

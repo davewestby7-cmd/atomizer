@@ -71,10 +71,18 @@ async def refresh(force: bool = False) -> None:
         state["refreshing"] = False
 
 
+def country_of(origin: str) -> str:
+    """'Tel Aviv Yafo, Israel' -> 'israel' (the last part of a location)."""
+    return origin.rsplit(",", 1)[-1].strip().lower() if origin else ""
+
+
 def _save(source: str, releases: list[Release], started) -> None:
     with Session(engine) as s:
         for rel in releases:
             rel.fetched_at = utcnow()
+            country = country_of(rel.origin)
+            if country and country not in rel.tags.split(","):
+                rel.tags = ",".join(t for t in (rel.tags, country) if t)
             upsert_release(s, rel)
         s.commit()
         if releases:  # forget old, un-pulled releases that have dropped off the source
@@ -132,7 +140,7 @@ def releases(bucket: str = "free", q: str = "", tag: str = "", source: str = "")
     if q:
         like = f"%{q}%"
         stmt = stmt.where(or_(col(Release.artist).ilike(like), col(Release.title).ilike(like),
-                              col(Release.label).ilike(like)))
+                              col(Release.label).ilike(like), col(Release.origin).ilike(like)))
     if tag:
         stmt = stmt.where(col(Release.tags).ilike(f"%{tag}%"))
     if source:
@@ -165,7 +173,7 @@ def status():
         "download_dir": str(settings.download_dir),
         "download_bytes": downloader.folder_size(settings.download_dir),
         "counts": counts,
-        "tags": [t for t, _ in tags.most_common(16)],
+        "tags": [t for t, _ in tags.most_common(24)],
         "home_currency": settings.home_currency,
         "cheap_threshold": settings.cheap_threshold,
     }

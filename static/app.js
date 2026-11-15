@@ -72,7 +72,7 @@ function renderChips() {
   box.innerHTML = "";
   const src = document.createElement("select");
   src.className = "bg-slate-900/80 border border-violet-800/60 rounded-full px-2 py-1 text-slate-300";
-  for (const [v, label] of [["", "all sources"], ["ektoplazm", "Ektoplazm"], ["bandcamp", "Bandcamp"]]) {
+  for (const [v, label] of [["", "all sources"], ["ektoplazm", "Ektoplazm"], ["bandcamp", "Bandcamp"], ["archive", "Internet Archive"], ["hearthis", "hearthis.at mixes"]]) {
     src.add(new Option(label, v, false, view.source === v));
   }
   src.onchange = () => { view.source = src.value; loadReleases(); };
@@ -114,10 +114,12 @@ function card(r) {
   node.querySelector(".artist").textContent = r.artist || r.label;
   node.querySelector(".title").textContent = r.title;
   node.querySelector(".title").title = r.title;
+  node.querySelector(".meta").title = r.origin || "";
   node.querySelector(".meta").textContent =
-    [r.label && r.label !== r.artist ? r.label : "", r.tags.slice(0, 3).join(" · "), r.released]
+    [r.origin ? `🌍 ${r.origin}` : "", r.label && r.label !== r.artist ? r.label : "",
+     r.tags.slice(0, 3).join(" · "), r.released]
       .filter(Boolean).join(" · ");
-  node.querySelector(".source").textContent = r.source;
+  node.querySelector(".source").textContent = r.kind === "mix" ? `${r.source} · mix` : r.source;
   const [ptext, pcls] = priceBadge(r);
   const pb = node.querySelector(".price");
   pb.textContent = ptext;
@@ -144,7 +146,7 @@ function card(r) {
   } else {
     // Bandcamp: downloads happen on Bandcamp's own page.
     pull.textContent = r.price_kind === "cheap" ? "🛒 Buy" : "⬇ Get";
-    pull.title = "Opens the Bandcamp page";
+    pull.title = `Opens the ${r.source} page`;
     pull.onclick = () => window.open(r.page_url, "_blank", "noopener");
   }
   return node;
@@ -222,7 +224,7 @@ async function removePulled(r) {
 
 $("#refreshBtn").onclick = async () => {
   await fetch("/api/refresh", { method: "POST" });
-  notice("Checking Ektoplazm and Bandcamp… new releases will appear in a minute or so.");
+  notice("Checking all sources… new releases will appear over the next few minutes.");
   pollWhileRefreshing();
 };
 

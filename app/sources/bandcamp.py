@@ -74,8 +74,37 @@ def parse_discover(data: dict, tag: str, rates: dict[str, float], threshold: flo
             stream_url=stream,
             tracks_json=json.dumps([stream] if stream else []),
             released=released,
+            origin=item.get("bandLocation") or "",
         ))
     return out
+
+
+async def _browse(client, tag, geoname_id, limit, rates, threshold, found) -> None:
+    """Read up to `limit` results for one tag (optionally one country) into `found`."""
+    cursor, seen = "*", 0
+    while seen < limit and cursor:
+        body = {
+            "category_id": 0, "tag_norm_names": [tag], "geoname_id": geoname_id,
+            "slice": "new", "cursor": cursor, "size": min(PAGE_SIZE, limit - seen),
+            "include_result_types": ["a", "s"],
+        }
+        try:
+            r = await client.post(DISCOVER_URL, json=body)
+            data = r.json()
+        except Exception as e:
+            log.warning("Bandcamp: tag %s (place %s) failed: %s", tag, geoname_id, e)
+            return
+        batch = parse_discover(data, tag, rates, threshold)
+        if not batch:
+            return
+        for rel in batch:
+            if rel.id in found:
+                tags = dict.fromkeys(found[rel.id].tags.split(",") + [tag])
+                found[rel.id].tags = ",".join(tags)
+            else:
+                found[rel.id] = rel
+        seen += len(batch)
+        cursor = data.get("cursor")
 
 
 async def fetch(client, settings, rates: dict[str, float] | None = None) -> list[Release]:
@@ -83,32 +112,17 @@ async def fetch(client, settings, rates: dict[str, float] | None = None) -> list
 
     cfg = settings.source("bandcamp")
     rates = rates or await get_rates(settings.home_currency)
-    per_tag = int(cfg.get("per_tag", 120))
     found: dict[str, Release] = {}
     for tag in cfg.get("tags", []):
-        cursor, seen = "*", 0
-        while seen < per_tag and cursor:
-            body = {
-                "category_id": 0, "tag_norm_names": [tag], "geoname_id": 0,
-                "slice": "new", "cursor": cursor, "size": min(PAGE_SIZE, per_tag - seen),
-                "include_result_types": ["a", "s"],
-            }
-            try:
-                r = await client.post(DISCOVER_URL, json=body)
-                data = r.json()
-            except Exception as e:
-                log.warning("Bandcamp: tag %s failed: %s", tag, e)
-                break
-            batch = parse_discover(data, tag, rates, settings.cheap_threshold)
-            if not batch:
-                break
-            for rel in batch:
-                if rel.id in found:
-                    tags = dict.fromkeys(found[rel.id].tags.split(",") + [tag])
-                    found[rel.id].tags = ",".join(tags)
-                else:
-                    found[rel.id] = rel
-            seen += len(batch)
-            cursor = data.get("cursor")
+        await _browse(client, tag, 0, int(cfg.get("per_tag", 120)), rates,
+                      settings.cheap_threshold, found)
+
+    # Country scenes: the same feed filtered to one country (GeoNames id).
+    for country in cfg.get("countries", []):
+        for tag in country.get("tags", ["psytrance"]):
+            await _browse(client, tag, int(country["geoname_id"]),
+                          int(country.get("per_tag", 60)), rates,
+                          settings.cheap_threshold, found)
+
     # We only keep what's worth showing: free, name-your-price and cheap.
     return [r for r in found.values() if r.price_kind != "paid"]

@@ -31,7 +31,46 @@ sources:
 
   bandcamp:
     enabled: true
-    # Bandcamp tags to browse
+    # Bandcamp tags to browse (worldwide)
     tags: [psytrance, psychedelic-trance, goa-trance, darkpsy, forest]
     # How many results to read per tag (Bandcamp returns up to 60 per page)
     per_tag: 120
+    # Country scenes. geoname_id comes from geonames.org (search the country,
+    # the number is in its page address). Add or remove countries freely.
+    countries:
+      - name: Israel
+        geoname_id: 294640
+        tags: [psytrance, goa-trance, progressive-psytrance, full-on, darkpsy, psychedelic-trance]
+        per_tag: 60
+      - name: India
+        geoname_id: 1269750
+        tags: [psytrance, goa-trance]
+      - name: Brazil
+        geoname_id: 3469034
+        tags: [psytrance, darkpsy]
+      - name: Japan
+        geoname_id: 1861060
+        tags: [psytrance]
+      - name: Mexico
+        geoname_id: 3996063
+        tags: [psytrance]
+      - name: Greece
+        geoname_id: 390903
+        tags: [psytrance]
+      - name: South Africa
+        geoname_id: 953987
+        tags: [psytrance]
+      - name: Australia
+        geoname_id: 2077456
+        tags: [psytrance]
+
+  archive:
+    # Internet Archive netlabels: Creative Commons releases from labels worldwide.
+    enabled: true
+    max_items: 80
+
+  hearthis:
+    # hearthis.at: free-download DJ mixes and tracks (opens the page to download)
+    enabled: true
+    genres: [psytrance, goa]
+    pages: 2
