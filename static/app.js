@@ -105,6 +105,7 @@ async function loadReleases() {
       : "Nothing here. Try another style, or press Refresh sources.";
   }
   for (const r of rows) grid.appendChild(card(r));
+  syncPlayState();
 }
 
 function card(r) {
@@ -129,8 +130,7 @@ function card(r) {
 
   const play = node.querySelector(".play");
   if (!r.tracks.length) { play.disabled = true; play.classList.add("opacity-40"); play.title = "No sample available"; }
-  play.onclick = () => togglePlay(r, node);
-  if (playingId === r.id) { node.classList.add("playing"); play.textContent = "❚❚ Stop"; }
+  play.onclick = () => togglePlay(r);
 
   const pull = node.querySelector(".pull");
   if (view.bucket === "pulled") {
@@ -153,21 +153,161 @@ function card(r) {
 }
 
 // ------------------------------------------------------------ actions
-function togglePlay(r, node) {
-  document.querySelectorAll(".playing").forEach((el) => {
-    el.classList.remove("playing");
-    el.querySelector(".play").textContent = "▶ Play";
-  });
-  if (playingId === r.id) { player.pause(); playingId = null; return; }
-  playingId = r.id;
-  // Ektoplazm gives a sample per track: pick one at random for variety.
-  const src = r.tracks[Math.floor(Math.random() * r.tracks.length)];
-  player.src = src;
-  player.play().catch(() => notice("Couldn't play that sample. Try 🔗 to open the page.", "error"));
-  node.classList.add("playing");
-  node.querySelector(".play").textContent = "❚❚ Stop";
+// ---- player: one release at a time; ⏮/⏭ move between its tracks
+let nowRelease = null;   // the release object that's loaded
+let nowIndex = 0;        // which of its tracks
+let seeking = false;     // true while the user drags the progress slider
+
+function fmtTime(s) {
+  if (!isFinite(s) || s < 0) return "0:00";
+  const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+  return m >= 60 ? `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")}:${String(sec).padStart(2, "0")}`
+                 : `${m}:${String(sec).padStart(2, "0")}`;
 }
-player.onended = () => { playingId = null; loadReleases(); };
+function setFill(range) {
+  range.style.setProperty("--pct", `${(range.value - range.min) * 100 / (range.max - range.min)}%`);
+}
+
+function togglePlay(r) {
+  if (nowRelease && nowRelease.id === r.id) {
+    player.paused ? player.play() : player.pause();
+  } else {
+    loadTrack(r, 0);
+  }
+}
+
+function loadTrack(r, index) {
+  nowRelease = r;
+  nowIndex = index;
+  playingId = r.id;
+  player.src = r.tracks[index];
+  player.play().catch(() => notice("Couldn't play that sample. Try 🔗 to open the page.", "error"));
+
+  $("#nowBar").classList.remove("hidden");
+  document.body.classList.add("has-player");
+  $("#npCover").src = r.cover_url || "";
+  $("#npTitle").textContent = r.title;
+  $("#npTitle").title = r.title;
+  $("#npArtist").textContent = [r.artist || r.label, r.origin ? `🌍 ${r.origin}` : ""].filter(Boolean).join(" · ");
+  $("#npTrack").textContent = r.tracks.length > 1 ? `Track ${index + 1} of ${r.tracks.length}` : r.source;
+  $("#npOpen").href = r.page_url;
+  $("#npPrev").disabled = index === 0 && r.tracks.length < 2;
+  $("#npNext").disabled = index >= r.tracks.length - 1;
+  $("#npSeek").value = 0; setFill($("#npSeek"));
+  $("#npTime").textContent = "0:00";
+  $("#npDur").textContent = "…";
+  syncPlayState();
+}
+
+function stopPlayer() {
+  player.pause();
+  player.removeAttribute("src");
+  player.load();
+  nowRelease = null;
+  playingId = null;
+  $("#nowBar").classList.add("hidden");
+  document.body.classList.remove("has-player");
+  syncPlayState();
+}
+
+// Keep the play buttons on the cards and in the bar in step with the audio.
+function syncPlayState() {
+  const playing = nowRelease && !player.paused;
+  $("#npPlay").textContent = playing ? "⏸" : "▶";
+  document.querySelectorAll("#grid article").forEach((el) => {
+    const mine = nowRelease && el.dataset.id === nowRelease.id;
+    el.classList.toggle("playing", !!mine);
+    const btn = el.querySelector(".play");
+    if (!btn.disabled) btn.textContent = mine && playing ? "❚❚ Pause" : "▶ Play";
+  });
+}
+
+player.addEventListener("play", syncPlayState);
+player.addEventListener("pause", syncPlayState);
+player.addEventListener("loadedmetadata", () => { $("#npDur").textContent = fmtTime(player.duration); });
+player.addEventListener("timeupdate", () => {
+  if (seeking || !isFinite(player.duration)) return;
+  const seek = $("#npSeek");
+  seek.value = Math.round(player.currentTime / player.duration * 1000);
+  setFill(seek);
+  $("#npTime").textContent = fmtTime(player.currentTime);
+});
+player.addEventListener("ended", () => {
+  // Carry on through the release's tracks, then stop.
+  if (nowRelease && nowIndex < nowRelease.tracks.length - 1) loadTrack(nowRelease, nowIndex + 1);
+  else { player.currentTime = 0; syncPlayState(); }
+});
+
+$("#npPlay").onclick = () => { if (nowRelease) player.paused ? player.play() : player.pause(); };
+$("#npPrev").onclick = () => {
+  if (!nowRelease) return;
+  // Like most players: past 3 seconds, ⏮ restarts the track; otherwise go back one.
+  if (player.currentTime > 3 || nowIndex === 0) player.currentTime = 0;
+  else loadTrack(nowRelease, nowIndex - 1);
+};
+$("#npNext").onclick = () => {
+  if (nowRelease && nowIndex < nowRelease.tracks.length - 1) loadTrack(nowRelease, nowIndex + 1);
+};
+const skip = (secs) => {
+  if (nowRelease && isFinite(player.duration))
+    player.currentTime = Math.min(Math.max(0, player.currentTime + secs), player.duration - 0.1);
+};
+$("#npBack").onclick = () => skip(-10);
+$("#npFwd").onclick = () => skip(10);
+$("#npClose").onclick = stopPlayer;
+
+const seek = $("#npSeek");
+seek.addEventListener("input", () => {
+  seeking = true;
+  setFill(seek);
+  if (isFinite(player.duration)) $("#npTime").textContent = fmtTime(seek.value / 1000 * player.duration);
+});
+seek.addEventListener("change", () => {
+  if (isFinite(player.duration)) player.currentTime = seek.value / 1000 * player.duration;
+  seeking = false;
+});
+
+const vol = $("#npVol");
+try { vol.value = localStorage.getItem("atomizer.volume") ?? 80; } catch {}
+player.volume = vol.value / 100;
+setFill(vol);
+vol.addEventListener("input", () => {
+  player.volume = vol.value / 100;
+  player.muted = false;
+  $("#npMute").textContent = vol.value == 0 ? "🔇" : "🔊";
+  setFill(vol);
+  try { localStorage.setItem("atomizer.volume", vol.value); } catch {}
+});
+$("#npMute").onclick = () => {
+  player.muted = !player.muted;
+  $("#npMute").textContent = player.muted ? "🔇" : "🔊";
+};
+
+// Keyboard: space = play/pause, ←/→ = 10 s, shift+←/→ = previous/next track.
+document.addEventListener("keydown", (e) => {
+  if (!nowRelease || e.target.closest?.("input, textarea, select, button")) return;
+  if (e.code === "Space") { e.preventDefault(); $("#npPlay").click(); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); e.shiftKey ? $("#npPrev").click() : skip(-10); }
+  else if (e.key === "ArrowRight") { e.preventDefault(); e.shiftKey ? $("#npNext").click() : skip(10); }
+});
+
+// Media keys / lock-screen / headphone buttons, where the browser supports it.
+if ("mediaSession" in navigator) {
+  player.addEventListener("play", () => {
+    if (!nowRelease) return;
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: nowRelease.title, artist: nowRelease.artist, album: nowRelease.label || nowRelease.source,
+      artwork: nowRelease.cover_url ? [{ src: nowRelease.cover_url, sizes: "350x350" }] : [],
+    });
+  });
+  const ms = navigator.mediaSession;
+  ms.setActionHandler("play", () => player.play());
+  ms.setActionHandler("pause", () => player.pause());
+  ms.setActionHandler("previoustrack", () => $("#npPrev").click());
+  ms.setActionHandler("nexttrack", () => $("#npNext").click());
+  ms.setActionHandler("seekbackward", () => skip(-10));
+  ms.setActionHandler("seekforward", () => skip(10));
+}
 
 async function doPull(r, node) {
   const btn = node.querySelector(".pull");
