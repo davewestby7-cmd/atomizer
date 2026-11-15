@@ -1,4 +1,4 @@
-// PsyPull front end. Plain JavaScript, no build step: edit and reload the page.
+// Atomizer front end. Plain JavaScript, no build step: edit and reload the page.
 
 const $ = (sel) => document.querySelector(sel);
 const view = { bucket: "free", q: "", tag: "", source: "" };
@@ -249,7 +249,7 @@ $("#search").oninput = (e) => {
 function setTab(bucket) {
   view.bucket = bucket;
   document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("tab-active", t.dataset.bucket === bucket));
-  try { localStorage.setItem("psypull.tab", bucket); } catch {}
+  try { localStorage.setItem("atomizer.tab", bucket); } catch {}
   loadReleases();
 }
 document.querySelectorAll(".tab").forEach((t) => (t.onclick = () => setTab(t.dataset.bucket)));
@@ -264,7 +264,7 @@ async function pollWhileRefreshing() {
 // ------------------------------------------------------------ start
 (async () => {
   let tab = "free";
-  try { tab = localStorage.getItem("psypull.tab") || "free"; } catch {}
+  try { tab = localStorage.getItem("atomizer.tab") || "free"; } catch {}
   await loadStatus();
   setTab(tab);
   if (status.refreshing) pollWhileRefreshing();

@@ -1,13 +1,13 @@
-# PsyPull 🍄
+# Atomizer 🍄
 
 A small web app you run on your own computer. It finds **free and cheap psytrance**
 from legal sources, lets you preview it, pulls the free releases into a folder and
 can optionally sync that folder to Google Drive.
 
-- **Ektoplazm** (ektoplazm.com) is a free Creative Commons psytrance netlabel. Every release is free, and PsyPull downloads and unzips it for you.
+- **Ektoplazm** (ektoplazm.com) is a free Creative Commons psytrance netlabel. Every release is free, and Atomizer downloads and unzips it for you.
 - **Bandcamp** tag feeds (psytrance, psychedelic-trance, goa-trance, darkpsy, forest) are sorted into **Free**, **Name Your Price** and **Cheap** (≤ AUD 5 by default). Downloads and purchases happen on Bandcamp's own page, so those cards link out.
 
-No YouTube or Spotify ripping, no accounts, no paywalled content. PsyPull obeys each
+No YouTube or Spotify ripping, no accounts, no paywalled content. Atomizer obeys each
 site's `robots.txt`, waits at least 1 second between requests, and only re-checks
 sources every 6 hours unless you press **Refresh sources**.
 
@@ -34,7 +34,7 @@ pip install -r requirements.txt && uvicorn app.main:app
 Then open http://127.0.0.1:8000. The first time, it takes about a minute to check
 the sources. Stop the app with `Ctrl+C`.
 
-> Windows tip: keep the project in a short path such as `C:\PsyPull`. Very long
+> Windows tip: keep the project in a short path such as `C:\Atomizer`. Very long
 > folder paths can make Python's installer fail.
 
 ## Using it
@@ -68,7 +68,7 @@ edit it. Restart the app after changing it.
 
 ## Google Drive sync (optional)
 
-PsyPull uses [rclone](https://rclone.org) to copy your downloads folder to Drive.
+Atomizer uses [rclone](https://rclone.org) to copy your downloads folder to Drive.
 
 1. Install rclone: <https://rclone.org/install/>. On Windows, `winget install Rclone.Rclone` works.
 2. Run `rclone config` in a terminal and answer:
@@ -79,18 +79,18 @@ PsyPull uses [rclone](https://rclone.org) to copy your downloads folder to Drive
    - Leave the rest as default. Say **yes** to "auto config"; a browser opens, so log in to Google and allow access.
    - Shared drive: `n`, then confirm with `y` and quit with `q`.
 3. Check it works: `rclone lsd gdrive:`
-4. In `config.yaml` set `rclone_remote: "gdrive:PsyPull"` and restart PsyPull.
+4. In `config.yaml` set `rclone_remote: "gdrive:Atomizer"` and restart Atomizer.
 
 Press **☁ Sync to Drive** whenever you like. With `rclone_mode: copy` (the default),
 files are only ever added to Drive. With `rclone_mode: sync`, Drive becomes an exact
-mirror, so deleting a release in PsyPull deletes it from Drive on the next sync.
+mirror, so deleting a release in Atomizer deletes it from Drive on the next sync.
 
 If rclone isn't installed or configured, the top bar says so and nothing breaks.
 
 ## Screenshots
 
 _Add yours here: run the app, take a screenshot, save it as `docs/screenshot.png`
-and link it like this:_ `![PsyPull](docs/screenshot.png)`
+and link it like this:_ `![Atomizer](docs/screenshot.png)`
 
 ## Tinkering guide
 

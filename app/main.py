@@ -1,4 +1,4 @@
-"""PsyPull web app. Run with:  uvicorn app.main:app"""
+"""Atomizer web app. Run with:  uvicorn app.main:app"""
 from __future__ import annotations
 
 import asyncio
@@ -27,7 +27,7 @@ from .sources import SOURCES
 from .sync import run_sync, sync_state
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
-log = logging.getLogger("psypull")
+log = logging.getLogger("atomizer")
 
 settings = load_settings()
 state = {"refreshing": False, "last_errors": {}, "pulling": set()}
@@ -100,7 +100,7 @@ async def lifespan(_app: FastAPI):
     task.cancel()
 
 
-app = FastAPI(title="PsyPull", lifespan=lifespan)
+app = FastAPI(title="Atomizer", lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
 
 

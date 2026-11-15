@@ -48,7 +48,7 @@ class Meta(SQLModel, table=True):
 
 
 engine = create_engine(
-    f"sqlite:///{ROOT / 'psypull.db'}", connect_args={"check_same_thread": False}
+    f"sqlite:///{ROOT / 'atomizer.db'}", connect_args={"check_same_thread": False}
 )
 
 

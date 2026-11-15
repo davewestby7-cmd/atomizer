@@ -14,7 +14,7 @@ from urllib.parse import urlsplit
 
 import httpx
 
-USER_AGENT = "PsyPull/0.1 (personal free-music finder)"
+USER_AGENT = "Atomizer/0.1 (personal free-music finder)"
 MIN_DELAY_SECONDS = 1.0
 
 
@@ -28,7 +28,7 @@ class Robots:
     rules: list[tuple[bool, str]] = field(default_factory=list)
 
     @classmethod
-    def parse(cls, text: str, agent: str = "psypull") -> "Robots":
+    def parse(cls, text: str, agent: str = "atomizer") -> "Robots":
         groups: list[tuple[list[str], list[tuple[bool, str]]]] = []
         agents: list[str] = []
         rules: list[tuple[bool, str]] = []

@@ -1,4 +1,4 @@
-# PsyPull settings. Copy this file to config.yaml and change what you like.
+# Atomizer settings. Copy this file to config.yaml and change what you like.
 # (config.yaml is ignored by git, so your personal settings stay private.)
 
 # Where pulled releases are saved. Relative paths are relative to the project folder.
@@ -16,7 +16,7 @@ cheap_threshold: 5.0
 refresh_hours: 6
 
 # Google Drive sync via rclone (https://rclone.org). Leave rclone_remote empty to switch it off.
-# Example: "gdrive:PsyPull" means the remote called "gdrive", folder "PsyPull".
+# Example: "gdrive:Atomizer" means the remote called "gdrive", folder "Atomizer".
 rclone_remote: ""
 # sync = make Drive an exact mirror (deleting a release here deletes it on Drive too)
 # copy = only ever add files to Drive, never delete

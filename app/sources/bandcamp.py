@@ -4,7 +4,7 @@ We use Bandcamp's public discover feed (the same one bandcamp.com/discover uses)
 which its robots.txt explicitly allows. Each result already includes the price,
 currency, a "free download" flag and a 30-second preview stream.
 
-PsyPull never downloads from Bandcamp itself: free and name-your-price downloads
+Atomizer never downloads from Bandcamp itself: free and name-your-price downloads
 go through Bandcamp's own page (often with an email step), so cards link out.
 """
 from __future__ import annotations
